@@ -263,7 +263,7 @@ namespace BililiveRecorder.WPF.Pages
             }
         }
 
-        private ServiceProvider BuildServiceProvider(Core.Config.V2.ConfigV2 config, ILogger logger) => new ServiceCollection()
+        private ServiceProvider BuildServiceProvider(Core.Config.V3.ConfigV3 config, ILogger logger) => new ServiceCollection()
             .AddSingleton(logger)
             .AddRecorderConfig(config)
             .AddFlv()

@@ -8,7 +8,7 @@ using System.Threading;
 using BililiveRecorder.Cli.Configure;
 using BililiveRecorder.Core;
 using BililiveRecorder.Core.Config;
-using BililiveRecorder.Core.Config.V2;
+using BililiveRecorder.Core.Config.V3;
 using BililiveRecorder.DependencyInjection;
 using BililiveRecorder.ToolBox;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,7 +39,7 @@ namespace BililiveRecorder.Cli
                 new Option<LogEventLevel>(new []{ "--logfilelevel", "--flog" }, () => LogEventLevel.Debug, "Minimal log level output to file"),
                 new Option<RecordMode>(new []{ "--record-mode", "--mode" }, () => RecordMode.Standard, "Recording mode"),
                 new Option<string>(new []{ "--cookie", "-c" }, "Cookie string for api requests"),
-                new Option<string>(new []{ "--filename-format", "-f" }, "File name format"),
+                new Option<string>(new []{ "--filename", "-f" }, "File name format"),
                 new Option<PortableModeArguments.PortableDanmakuMode>(new []{ "--danmaku", "-d" }, "Flags for danmaku recording"),
                 new Option<string>("--webhook-url", "URL of webhoook"),
                 new Option<string>("--live-api-host"),
@@ -100,7 +100,7 @@ namespace BililiveRecorder.Cli
             using var logger = BuildLogger(opts.LogLevel, opts.LogFileLevel);
             Log.Logger = logger;
 
-            var config = new ConfigV2()
+            var config = new ConfigV3()
             {
                 DisableConfigSave = true,
             };
@@ -114,8 +114,8 @@ namespace BililiveRecorder.Cli
                 if (!string.IsNullOrWhiteSpace(opts.LiveApiHost))
                     global.LiveApiHost = opts.LiveApiHost;
 
-                if (!string.IsNullOrWhiteSpace(opts.FilenameFormat))
-                    global.RecordFilenameFormat = opts.FilenameFormat;
+                if (!string.IsNullOrWhiteSpace(opts.Filename))
+                    global.FileNameRecordTemplate = opts.Filename;
 
                 if (!string.IsNullOrWhiteSpace(opts.WebhookUrl))
                     global.WebHookUrlsV2 = opts.WebhookUrl;
@@ -153,7 +153,7 @@ namespace BililiveRecorder.Cli
             return 0;
         }
 
-        private static IServiceProvider BuildServiceProvider(ConfigV2 config, ILogger logger) => new ServiceCollection()
+        private static IServiceProvider BuildServiceProvider(ConfigV3 config, ILogger logger) => new ServiceCollection()
             .AddSingleton(logger)
             .AddFlv()
             .AddRecorderConfig(config)
@@ -193,7 +193,7 @@ namespace BililiveRecorder.Cli
 
             public string? LiveApiHost { get; set; }
 
-            public string? FilenameFormat { get; set; }
+            public string? Filename { get; set; }
 
             public string? WebhookUrl { get; set; }
 
