@@ -10,7 +10,7 @@ namespace BililiveRecorder.Core.Api
         public static async Task<CodecItem?> GetCodecItemInStreamUrlAsync(this IApiClient apiClient, int roomid, int qn)
         {
             var apiResp = await apiClient.GetStreamUrlAsync(roomid: roomid, qn: qn).ConfigureAwait(false);
-            var url_data = apiResp?.Data?.PlayurlInfo?.Playurl?.Streams;
+            var url_data = apiResp?.PlayurlInfo?.Playurl?.Streams;
 
             if (url_data is null)
                 throw new Exception("playurl is null");

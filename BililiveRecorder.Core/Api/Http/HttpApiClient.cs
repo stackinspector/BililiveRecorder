@@ -75,7 +75,7 @@ namespace BililiveRecorder.Core.Api.Http
                 this.SetCookie();
         }
 
-        private static async Task<BilibiliApiResponse<T>> FetchAsync<T>(HttpClient client, string url) where T : class
+        private static async Task<T> FetchAsync<T>(HttpClient client, string url) where T : class
         {
             var resp = await client.GetAsync(url).ConfigureAwait(false);
 
@@ -87,14 +87,22 @@ namespace BililiveRecorder.Core.Api.Http
             var text = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var obj = JsonConvert.DeserializeObject<BilibiliApiResponse<T>>(text);
-            if (obj?.Code == -412)
+            var code = obj?.Code;
+            if (code == 0)
+            {
+                // code为0，则data一定不为null
+                var data = obj?.Data;
+                if (data == null)
+                    throw new Exception("data=null when code=0");
+                return data;
+            }
+            else if (code != -412)
                 throw new BilibiliApiRateLimitedException("Found rate limited from response code -412 when requesting " + url);
-            else if (obj?.Code != 0)
-                throw new BilibiliApiCommonException("Response code " + obj?.Code?.ToString() ?? "(null)" + ", full response:\n" + text);
-            return obj;
+            else
+                throw new BilibiliApiCommonException("Response code " + code?.ToString() ?? "(null)" + ", full response:\n" + text);
         }
 
-        public Task<BilibiliApiResponse<RoomInfo>> GetRoomInfoAsync(int roomid)
+        public Task<RoomInfo> GetRoomInfoAsync(int roomid)
         {
             if (this.disposedValue)
                 throw new ObjectDisposedException(nameof(HttpApiClient));
@@ -103,7 +111,7 @@ namespace BililiveRecorder.Core.Api.Http
             return FetchAsync<RoomInfo>(this.mainClient, url);
         }
 
-        public Task<BilibiliApiResponse<UserInfo>> GetUserInfoAsync(int roomid)
+        public Task<UserInfo> GetUserInfoAsync(int roomid)
         {
             if (this.disposedValue)
                 throw new ObjectDisposedException(nameof(HttpApiClient));
@@ -112,7 +120,7 @@ namespace BililiveRecorder.Core.Api.Http
             return FetchAsync<UserInfo>(this.mainClient, url);
         }
 
-        public Task<BilibiliApiResponse<ExtRoomInfo>> GetExtRoomInfoAsync(int roomid)
+        public Task<ExtRoomInfo> GetExtRoomInfoAsync(int roomid)
         {
             if (this.disposedValue)
                 throw new ObjectDisposedException(nameof(HttpApiClient));
@@ -121,7 +129,7 @@ namespace BililiveRecorder.Core.Api.Http
             return FetchAsync<ExtRoomInfo>(this.mainClient, url);
         }
 
-        public Task<BilibiliApiResponse<RoomPlayInfo>> GetStreamUrlAsync(int roomid, int qn)
+        public Task<RoomPlayInfo> GetStreamUrlAsync(int roomid, int qn)
         {
             if (this.disposedValue)
                 throw new ObjectDisposedException(nameof(HttpApiClient));
@@ -130,7 +138,7 @@ namespace BililiveRecorder.Core.Api.Http
             return FetchAsync<RoomPlayInfo>(this.mainClient, url);
         }
 
-        public Task<BilibiliApiResponse<DanmuInfo>> GetDanmakuServerAsync(int roomid)
+        public Task<DanmuInfo> GetDanmakuServerAsync(int roomid)
         {
             if (this.disposedValue)
                 throw new ObjectDisposedException(nameof(HttpApiClient));

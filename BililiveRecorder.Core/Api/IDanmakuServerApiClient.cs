@@ -6,6 +6,6 @@ namespace BililiveRecorder.Core.Api
 {
     public interface IDanmakuServerApiClient : IDisposable
     {
-        Task<BilibiliApiResponse<DanmuInfo>> GetDanmakuServerAsync(int roomid);
+        Task<DanmuInfo> GetDanmakuServerAsync(int roomid);
     }
 }

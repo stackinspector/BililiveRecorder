@@ -75,9 +75,9 @@ namespace BililiveRecorder.Core.Api.Danmaku
                     return;
 
                 var serverInfo = await this.apiClient.GetDanmakuServerAsync(roomid).ConfigureAwait(false);
-                if (serverInfo.Data is null)
+                if (serverInfo is null)
                     return;
-                serverInfo.Data.ChooseOne(out var host, out var port, out var token);
+                serverInfo.ChooseOne(out var host, out var port, out var token);
 
                 this.logger.Debug("Connecting to {Host}:{Port} with a {TokenLength} char long token for room {RoomId}", host, port, token?.Length, roomid);
 

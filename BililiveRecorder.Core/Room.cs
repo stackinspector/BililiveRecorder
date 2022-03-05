@@ -183,7 +183,7 @@ namespace BililiveRecorder.Core
         {
             if (this.disposedValue)
                 return;
-            var room = (await this.apiClient.GetRoomInfoAsync(this.RoomConfig.RoomId).ConfigureAwait(false)).Data;
+            var room = await this.apiClient.GetRoomInfoAsync(this.RoomConfig.RoomId).ConfigureAwait(false);
             if (room != null)
             {
                 this.RoomConfig.RoomId = room.RoomId;
@@ -201,7 +201,7 @@ namespace BililiveRecorder.Core
             if (this.disposedValue)
                 return;
             var user = await this.apiClient.GetUserInfoAsync(this.RoomConfig.RoomId).ConfigureAwait(false);
-            this.Name = user.Data?.Info?.Name ?? this.Name;
+            this.Name = user?.Info?.Name ?? this.Name;
         }
 
         /// <exception cref="Exception"/>
@@ -209,7 +209,7 @@ namespace BililiveRecorder.Core
         {
             if (this.disposedValue)
                 return;
-            var resp = (await this.apiClient.GetExtRoomInfoAsync(this.RoomConfig.RoomId).ConfigureAwait(false)).Data;
+            var resp = await this.apiClient.GetExtRoomInfoAsync(this.RoomConfig.RoomId).ConfigureAwait(false);
             var room = resp?.RoomInfo;
             var user = resp?.UserInfo;
             if (room != null)
