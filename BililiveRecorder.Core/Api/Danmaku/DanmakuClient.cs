@@ -212,7 +212,6 @@ namespace BililiveRecorder.Core.Api.Danmaku
                 roomid = roomid,
                 protover = 0,
                 platform = "web",
-                clientver = "2.6.25",
                 type = 2,
                 key = token,
             }, Formatting.None));
