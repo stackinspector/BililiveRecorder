@@ -80,15 +80,17 @@ namespace BililiveRecorder.Core.Api.Http
             var resp = await client.GetAsync(url).ConfigureAwait(false);
 
             if (resp.StatusCode == (HttpStatusCode)412)
-                throw new Http412Exception("Got HTTP Status 412 when requesting " + url);
+                throw new BilibiliApiRateLimitedException("Found rate limited from HTTP status code 412 when requesting " + url);
 
             resp.EnsureSuccessStatusCode();
 
             var text = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             var obj = JsonConvert.DeserializeObject<BilibiliApiResponse<T>>(text);
-            if (obj?.Code != 0)
-                throw new BilibiliApiResponseCodeNotZeroException("Bilibili api code: " + (obj?.Code?.ToString() ?? "(null)") + "\n" + text);
+            if (obj?.Code == -412)
+                throw new BilibiliApiRateLimitedException("Found rate limited from response code -412 when requesting " + url);
+            else if (obj?.Code != 0)
+                throw new BilibiliApiCommonException("Response code " + obj?.Code?.ToString() ?? "(null)" + ", full response:\n" + text);
             return obj;
         }
 

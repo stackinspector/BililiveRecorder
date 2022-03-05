@@ -17,14 +17,14 @@ namespace BililiveRecorder.Core
 
         public PollyPolicy()
         {
-            this.IpBlockedHttp412CircuitBreakerPolicy = Policy
-                .Handle<Http412Exception>()
+            this.IpBlockedRateLimitedCircuitBreakerPolicy = Policy
+                .Handle<BilibiliApiRateLimitedException>()
                 .CircuitBreakerAsync(
                 exceptionsAllowedBeforeBreaking: 1,
                 durationOfBreak: TimeSpan.FromMinutes(2),
                 onBreak: (_, _) =>
                 {
-                    logger.Warning("检测到被屏蔽(HTTP 412)，暂停发送请求");
+                    logger.Warning("检测到因请求发送频率过快而被屏蔽，暂停发送请求");
                 },
                 onReset: () =>
                 {
@@ -32,13 +32,13 @@ namespace BililiveRecorder.Core
                 },
                 onHalfOpen: () =>
                 {
-                    logger.Debug(nameof(this.IpBlockedHttp412CircuitBreakerPolicy) + " onHalfOpen");
+                    logger.Debug(nameof(this.IpBlockedRateLimitedCircuitBreakerPolicy) + " onHalfOpen");
                 });
 
             this.RequestFailedCircuitBreakerPolicy = Policy
                 .Handle<HttpRequestException>()
                 .Or<JsonException>()
-                .Or<BilibiliApiResponseCodeNotZeroException>()
+                .Or<BilibiliApiCommonException>()
                 .AdvancedCircuitBreakerAsync(
                 failureThreshold: 0.8,
                 samplingDuration: TimeSpan.FromSeconds(30),
@@ -65,14 +65,14 @@ namespace BililiveRecorder.Core
             var memoryCacheProvider = new MemoryCacheProvider(this.memoryCache);
             var cachePolicy = Policy.CacheAsync(memoryCacheProvider, TimeSpan.FromMinutes(2));
 
-            this[PolicyNames.PolicyRoomInfoApiRequestAsync] = Policy.WrapAsync(bulkhead, retry, this.IpBlockedHttp412CircuitBreakerPolicy, this.RequestFailedCircuitBreakerPolicy);
-            this[PolicyNames.PolicyDanmakuApiRequestAsync] = Policy.WrapAsync(cachePolicy, bulkhead, retry, this.IpBlockedHttp412CircuitBreakerPolicy, this.RequestFailedCircuitBreakerPolicy);
-            this[PolicyNames.PolicyStreamApiRequestAsync] = Policy.WrapAsync(bulkhead, retry, this.IpBlockedHttp412CircuitBreakerPolicy, this.RequestFailedCircuitBreakerPolicy);
+            this[PolicyNames.PolicyRoomInfoApiRequestAsync] = Policy.WrapAsync(bulkhead, retry, this.IpBlockedRateLimitedCircuitBreakerPolicy, this.RequestFailedCircuitBreakerPolicy);
+            this[PolicyNames.PolicyDanmakuApiRequestAsync] = Policy.WrapAsync(cachePolicy, bulkhead, retry, this.IpBlockedRateLimitedCircuitBreakerPolicy, this.RequestFailedCircuitBreakerPolicy);
+            this[PolicyNames.PolicyStreamApiRequestAsync] = Policy.WrapAsync(bulkhead, retry, this.IpBlockedRateLimitedCircuitBreakerPolicy, this.RequestFailedCircuitBreakerPolicy);
 
         }
 
         public readonly MemoryCache memoryCache;
-        public readonly AsyncCircuitBreakerPolicy IpBlockedHttp412CircuitBreakerPolicy;
+        public readonly AsyncCircuitBreakerPolicy IpBlockedRateLimitedCircuitBreakerPolicy;
         public readonly AsyncCircuitBreakerPolicy RequestFailedCircuitBreakerPolicy;
     }
 }

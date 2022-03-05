@@ -26,7 +26,7 @@ namespace BililiveRecorder.WPF.Models
                 {
                     if (this.policy != null)
                     {
-                        this.policy.IpBlockedHttp412CircuitBreakerPolicy.Reset();
+                        this.policy.IpBlockedRateLimitedCircuitBreakerPolicy.Reset();
                         this.policy.RequestFailedCircuitBreakerPolicy.Reset();
                     }
                 }
