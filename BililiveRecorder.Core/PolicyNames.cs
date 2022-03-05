@@ -8,6 +8,7 @@ namespace BililiveRecorder.Core
 
         internal const string CacheKeyUserInfo = nameof(CacheKeyUserInfo);
         internal const string CacheKeyRoomInfo = nameof(CacheKeyRoomInfo);
+        internal const string CacheKeyExtRoomInfo = nameof(CacheKeyExtRoomInfo);
         internal const string CacheKeyDanmaku = nameof(CacheKeyDanmaku);
         internal const string CacheKeyStream = nameof(CacheKeyStream);
     }

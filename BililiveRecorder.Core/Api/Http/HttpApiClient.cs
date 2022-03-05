@@ -110,6 +110,15 @@ namespace BililiveRecorder.Core.Api.Http
             return FetchAsync<UserInfo>(this.mainClient, url);
         }
 
+        public Task<BilibiliApiResponse<ExtRoomInfo>> GetExtRoomInfoAsync(int roomid)
+        {
+            if (this.disposedValue)
+                throw new ObjectDisposedException(nameof(HttpApiClient));
+
+            var url = $@"{this.config.LiveApiHost}/xlive/web-room/v1/index/getH5InfoByRoom?room_id={roomid}";
+            return FetchAsync<ExtRoomInfo>(this.mainClient, url);
+        }
+
         public Task<BilibiliApiResponse<RoomPlayInfo>> GetStreamUrlAsync(int roomid, int qn)
         {
             if (this.disposedValue)

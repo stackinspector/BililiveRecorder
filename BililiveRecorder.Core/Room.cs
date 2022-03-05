@@ -204,6 +204,26 @@ namespace BililiveRecorder.Core
             this.Name = user.Data?.Info?.Name ?? this.Name;
         }
 
+        /// <exception cref="Exception"/>
+        private async Task FetchExtRoomInfoAsync()
+        {
+            if (this.disposedValue)
+                return;
+            var resp = (await this.apiClient.GetExtRoomInfoAsync(this.RoomConfig.RoomId).ConfigureAwait(false)).Data;
+            var room = resp?.RoomInfo;
+            var user = resp?.UserInfo;
+            if (room != null)
+            {
+                this.RoomConfig.RoomId = room.RoomId;
+                this.ShortId = 0;
+                this.Title = room.Title;
+                this.AreaNameParent = room.ParentAreaName;
+                this.AreaNameChild = room.AreaName;
+                this.Streaming = room.LiveStatus == 1;
+            }
+            this.Name = user?.BaseInfo?.Name ?? this.Name;
+        }
+
         ///
         private void CreateAndStartNewRecordTask()
         {
