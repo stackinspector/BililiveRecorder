@@ -57,6 +57,7 @@ namespace BililiveRecorder.Core.Api.Http
             if (!string.IsNullOrWhiteSpace(cookie_string))
             {
                 headers.Add("Cookie", cookie_string);
+
                 long.TryParse(matchCookieUidRegex.Match(cookie_string).Groups[1].Value, out var uid);
                 this.uid = uid;
                 string buvid3 = matchCookieBuvid3Regex.Match(cookie_string).Groups[1].Value;
@@ -68,6 +69,7 @@ namespace BililiveRecorder.Core.Api.Http
             else
             {
                 this.uid = 0;
+                this.buvid3 = null;
             }
 
             var old = Interlocked.Exchange(ref this.client, client);
